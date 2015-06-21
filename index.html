@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Developing Data Products</title>
+  <meta charset="utf-8">
+  <meta name="description" content="Developing Data Products">
+  <meta name="author" content="">
+  <meta name="generator" content="slidify" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/default.css" media="all" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/phone.css" 
+    media="only screen and (max-device-width: 480px)" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/slidify.css" >
+  <link rel="stylesheet" href="libraries/highlighters/highlight.js/css/tomorrow.css" />
+  <base target="_blank"> <!-- This amazingness opens all links in a new tab. -->  <link rel=stylesheet href="./assets/css/ribbons.css"></link>
+
+  
+  <!-- Grab CDN jQuery, fall back to local if offline -->
+  <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.min.js"></script>
+  <script>window.jQuery || document.write('<script src="libraries/widgets/quiz/js/jquery.js"><\/script>')</script> 
+  <script data-main="libraries/frameworks/io2012/js/slides" 
+    src="libraries/frameworks/io2012/js/require-1.0.8.min.js">
+  </script>
+  
+  
+
+</head>
+<body style="opacity: 0">
+  <slides class="layout-widescreen">
+    
+    <!-- LOGO SLIDE -->
+        <slide class="title-slide segue nobackground">
+  <hgroup class="auto-fadein">
+    <h1>Developing Data Products</h1>
+    <h2>String Similarity Measures Shiny App</h2>
+    <p><br/></p>
+  </hgroup>
+  <article></article>  
+</slide>
+    
+
+    <!-- SLIDES -->
+    <slide class="" id="slide-1" style="background:;">
+  <hgroup>
+    <h3>Introduction</h3>
+  </hgroup>
+  <article data-timings="">
+    <p>In a world with typos and fuzziness everywhere it is highly valuable to be able to compare the similarity of stings. The shiny app developed in this programming assignment provides functionality to compute the \(\textit{String Similarity}\) between two given strings according to a bunch of common \(\textit{String Similarity Measures}\). A string similarity measure is a function that maps two strings to a value between \(0\) and \(1\) indicating the degree of similarity between both. Two strings one wants to compare can be entered to the shiny app. Similarity measures that should be applied can be chosen by using check boxes. After hitting the calculate button the results are displayed at the right. Please note that the two input string are only compared after lowercasing them and that the resulting similarities are rounded. The following slides introduce the different Similarity Measures incorporated into the app.</p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id" style="background:;">
+  <hgroup>
+    <h3>Exact, Jaro and Jaro-Winkler Similarity</h3>
+  </hgroup>
+  <article data-timings="">
+    <p>The \(\textit{Exact Similarity}\) is just one if the two strings are the same and zero if not.</p>
+
+<p>All of the following string similarity measures are provided in the &quot;stringdist&quot; package.</p>
+
+<p>The \(\textit{Jaro Similarity}\) (\(j\)) of the strings \(s^{}_{1}\) and \(s^{}_{2}\) is defined as
+\(j = \left\{ \begin{array}{l l} 0 & \text{for }m = 0\\ \frac{1}{3}\left(\frac{m}{|s^{}_{1}|} + \frac{m}{|s^{}_{2}|} + \frac{m - t}{m}\right) & \text{else} \end{array} \right.\)</p>
+
+<p>Where \(m\) is the number of matching characters and \(t\) is half the number of transpositions between \(s^{}_{1}\) and \(s^{}_{2}\).
+The \(\textit{Jaro-Winkler Similarity}\) is than the Jaro Similarity plus the Winkler bonus for common prefixes \(jw = j + (\ell \cdot p \cdot (1 - j))\). (\(\ell\) is the common prefix length, \(p = 0.1\)). Comparing &quot;text&quot; and &quot;texts&quot; results in similarity 0.93 for Jaro and 0.96 for Jaro-Winkler. Whereas &quot;text&quot; and &quot;stext&quot; have the same similarity (0.93) since there is no common prefix. </p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id" style="background:;">
+  <hgroup>
+    <h3>(Damerau-)Levenshtein and N-Gram Similarity</h3>
+  </hgroup>
+  <article data-timings="">
+    <p>\(\textit{Levenshtein distance}\) is calculated by counting all string operations needed to transform one string into another. Valid operations are insertion, deletion and substitution of characters. E.g. substitute &#39;s&#39; with &#39;x&#39; to transform &quot;test&quot; into &quot;text&quot;. To get a similarity from that distance, we have to normalize it with \(1 - \frac{distance}{\min\{|s^{}_{1}|, |s^{}_{2}|\}}\), where \(|\cdot|\) gives the length of a string:</p>
+
+<pre><code class="r">1 - stringdist(&quot;test&quot;, &quot;text&quot;, method = &quot;lv&quot;) / min(4, 4)
+</code></pre>
+
+<pre><code>## [1] 0.75
+</code></pre>
+
+<p>\(\textit{Damerau-Levenshtein}\) is an extension of Levenshtein which has an additional operation, the transposition of characters. Comparing &quot;test&quot; and &quot;tset&quot; has a Damerau-Levenshtein Similarity of 0.75. Levenshtein Similarity is just 0.5 since two substitutions are needed instead of one transposition.</p>
+
+<p>The \(\textit{N-Gram Similarity}\) is another extension of Levenshtein. Instead of working on single characters it works on so called \(n\)-grams which are character sets of length \(n\). For \(n = 1\) Levenshtein and N-Gram Similarity are equal.</p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id" style="background:;">
+  <hgroup>
+    <h3>Cosine, Jaccard and SoundEx Similarity</h3>
+  </hgroup>
+  <article data-timings="">
+    <p>\(\textit{Cosine}\) and \(\textit{Jaccard Similarity}\) also operate on \(n\)-grams.</p>
+
+<p>The formula for the Cosine Similarity is given by \(1- \frac{a^{T}b}{\sqrt{a^{T}_{}a\cdot b^{T}_{}b}}\), where \(a\) and \(b\) are the vectors holding the \(n\)-gram frequencies of the two strings. With \(n = 2\) the frequency vectors for &quot;abc&quot; and &quot;cab&quot; are \((1, 1, 0)^{T}_{}\) and \((1, 0, 1)^{T}_{}\), so the similarity is \(1 - \frac{1}{\sqrt{2 \cdot 2}} =\) 0.5.</p>
+
+<p>Jaccard Similarity is given by \(1- \frac{|A \cap B|}{|A \cup B|}\), where \(A\) and \(B\) are the set of \(n\)-grams of the two compared strings.
+Using Jaccard with \(n = 2\) the similarity between &quot;abc&quot; and &quot;cab&quot; is 0.33 since the \(2\)-grams are &quot;ab&quot;, &quot;bc&quot; and &quot;ca&quot; and both share &quot;ab&quot;.</p>
+
+<p>\(\textit{SoundEx}\) is a phonetic similarity measure. It computes some kind of phonetic hash value for each string. If those values are the same the similarity is one and if not zero. Comparing &quot;test&quot; with &quot;text&quot; gives us a similarity of 1, whereas &quot;test&quot; and &quot;teot&quot; have similarity 0. All other similarity measures would have the same similarity for this two comparisons.</p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+    <slide class="backdrop"></slide>
+  </slides>
+  <div class="pagination pagination-small" id='io2012-ptoc' style="display:none;">
+    <ul>
+      <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=1 title='Introduction'>
+         1
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=2 title='Exact, Jaro and Jaro-Winkler Similarity'>
+         2
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=3 title='(Damerau-)Levenshtein and N-Gram Similarity'>
+         3
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=4 title='Cosine, Jaccard and SoundEx Similarity'>
+         4
+      </a>
+    </li>
+  </ul>
+  </div>  <!--[if IE]>
+    <script 
+      src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js">  
+    </script>
+    <script>CFInstall.check({mode: 'overlay'});</script>
+  <![endif]-->
+</body>
+  <!-- Load Javascripts for Widgets -->
+  
+  <!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true
+      }
+    });
+  </script>
+  <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/2.0-latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  <!-- <script src="https://c328740.ssl.cf1.rackcdn.com/mathjax/2.0-latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  </script> -->
+  <script>window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="libraries/widgets/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"><\/script>')
+</script>
+<!-- LOAD HIGHLIGHTER JS FILES -->
+  <script src="libraries/highlighters/highlight.js/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+  <!-- DONE LOADING HIGHLIGHTER JS FILES -->
+   
+  </html>
